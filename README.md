@@ -5,81 +5,40 @@ Campus Navigator is a real-time landmark recognition and navigation system for c
 **1. 🧭 Initial Interaction (index.html)**
     Upon launching the app via index.html, users are presented with two main actions:
 
-    a)📍 Send My Location
+a)📍 Send My Location: Captures the user's GPS coordinates (one-time at the start of the session). Triggers navigation logic in server.js to identify the two nearest unvisited landmarks using geospatial calculations.
 
-    Captures the user's GPS coordinates (one-time at the start of the session).
-
-    Triggers navigation logic in server.js to identify the two nearest unvisited landmarks using geospatial calculations.
-
-b) 📸 Open Camera
-
-    Launches the device’s webcam for image capture.
-
-    Captured image is sent to the backend for landmark recognition and description retrieval.
-
+b) 📸 Open Camera: Launches the device’s webcam for image capture. Captured image is sent to the backend for landmark recognition and description retrieval.
+---------------------------------------------------------------------------------------
 **2. 📡 Location-Based Navigation (Persistent Session)**
 Once location is submitted, a live navigation session begins:
 
-    -🗺 Haversine Distance Calculation
+🗺 Haversine Distance Calculation: Calculates distances between the user’s location and all campus landmarks using the Haversine formula.
 
-        Calculates distances between the user’s location and all campus landmarks using the Haversine formula.
+✅ Visited Landmark Tracking: A global visited object in server.js tracks which landmarks the user has already seen.
 
-    -✅ Visited Landmark Tracking
+📌 Nearest Landmark Selection: Filters out visited landmarks. Sorts remaining landmarks by proximity. Selects the two nearest unvisited landmarks to guide the user.
 
-        A global visited object in server.js tracks which landmarks the user has already seen.
-
-    -📌 Nearest Landmark Selection
-
-        Filters out visited landmarks.
-
-        Sorts remaining landmarks by proximity.
-
-        Selects the two nearest unvisited landmarks to guide the user.
-
-    -🔊 Audio Navigation Instructions
-
-        Navigation directions are generated using audio_conversion.py (Google Text-to-Speech).
-
-        Returned to the frontend as .mp3 files for playback.
-
+🔊 Audio Navigation Instructions: Navigation directions are generated using audio_conversion.py (Google Text-to-Speech). Returned to the frontend as .mp3 files for playback.
+---------------------------------------------------------------------------------------
 
 **3. 🧠 Image-Based Landmark Recognition (model_1.py)**
 When the user captures or uploads a landmark image:
 
-    🔁 API Communication
-        The image is sent from index.html to the /classify-image API endpoint.
+🔁 API Communication: The image is sent from index.html to the /classify-image API endpoint.
 
-    🧪 Deep Learning Pipeline
-        a. Image Preprocessing
+🧪 Deep Learning Pipeline
+a. Image Preprocessing: Resize and crop image. Enhance contrast and apply Gaussian blur. Normalize and reshape to 224×224 pixels
 
-            Resize and crop image
+b. Landmark Classification: Uses a MobileNetV2 model fine-tuned to recognize 8 specific campus landmarks. Outputs a predicted label and confidence score
 
-            Enhance contrast and apply Gaussian blur
+c. OCR Fallback: If confidence < 60%, applies Tesseract OCR to read text in the image for a possible match
 
-            Normalize and reshape to 224×224 pixels
+d. Description Retrieval: Fetches detailed info from landmarks2.json based on the detected label
 
-        b. Landmark Classification
+e. Audio Generation: Uses Google TTS to generate speech describing the landmark. Saves the result as an .mp3 and returns the URL
 
-            Uses a MobileNetV2 model fine-tuned to recognize 8 specific campus landmarks
-
-            Outputs a predicted label and confidence score
-
-        c. OCR Fallback
-
-            If confidence < 60%, applies Tesseract OCR to read text in the image for a possible match
-
-        d. Description Retrieval
-
-            Fetches detailed info from landmarks2.json based on the detected label
-
-        e. Audio Generation
-
-            Uses Google TTS to generate speech describing the landmark
-
-            Saves the result as an .mp3 and returns the URL
-
-            🧾 Example JSON Response
-            ![image](https://github.com/user-attachments/assets/8d7b5d66-b374-46bc-9da9-12a5854e449e)
+🧾 Example JSON Response
+![image](https://github.com/user-attachments/assets/8d7b5d66-b374-46bc-9da9-12a5854e449e)
 
 
 
@@ -90,30 +49,24 @@ When the user captures or uploads a landmark image:
 
 
 4. 🌐 AR Display Interface (ar.html)
-Designed for smart glasses (e.g. Vuzix), this interface provides hands-free landmark updates:
+Designed for smart glasses (e.g., Vuzix), this interface provides hands-free landmark updates:
 
-    📥 Continuous Polling
+    📥 Continuous Polling:  ar.html polls the /current-label endpoint to get the latest classification result.
 
-        ar.html polls the /current-label endpoint to get the latest classification result.
+    🔄 Real-Time Sync with index.html: Whenever a new landmark is recognized on index.html, the AR interface is immediately updated.
 
-    🔄 Real-Time Sync with index.html
-
-        Whenever a new landmark is recognized on index.html, the AR interface is immediately updated.
-
-    🧼 Minimalist UI
-
-        Only the landmark label and description are shown — perfect for glanceable, non-intrusive AR display.
+    🧼 Minimalist UI: Only the landmark label and description are shown — perfect for glanceable, non-intrusive AR display.
 
 
 
 🧩 Technical Highlights
 Feature	Description
-    🎯 Dual Modality Output	Combines image-based text and audio narration
-    🧠 Hybrid Recognition	CNN-based prediction with OCR fallback
+    🎯 Dual Modality Output Combines image-based text and audio narration
+    🧠 Hybrid Recognition CNN-based prediction with OCR fallback
     ⚡ Optimized Preprocessing	Speed + accuracy with contrast enhancement and resizing
-    📍 Location-Aware Guidance	Uses Haversine formula for real-time navigation
-    🧱 Modular Architecture	Clear separation between UI, model, server, and audio engine
-    🕶 AR-Ready by Design	Supports reactive display for smart glasses
+    📍 Location-Aware Guidance	Uses the Haversine formula for real-time navigation
+    🧱 Modular Architecture Clear separation between UI, model, server, and audio engine
+    🕶 AR-Ready by Design Supports reactive display for smart glasses
 
 🗂 Key Project Files
 File	              Role & Description
