@@ -9,6 +9,7 @@ Upon launching the application through index.html, users are presented with two 
 
 📸 "Open Camera": Launches the webcam interface, allowing users to capture images of landmarks in real-time. The image is sent to the backend for landmark classification and information retrieval.
 
+
 2. 📡 Location-Based Navigation (Persistent Session)
 Once the user's location is submitted, the server (via server.js) activates a navigation system powered by:
 
@@ -19,6 +20,7 @@ Visited Landmark Tracking: A global visited object keeps track of user progress 
 Nearest Landmark Selection: Filters out visited landmarks, sorts the rest by distance, and selects the two nearest unvisited landmarks.
 
 Audio Navigation Instructions: Text-to-speech prompts are generated dynamically using audio_conversion.py and returned as .mp3 files for playback.
+
 
 3. 🧠 **Image-Based Landmark Recognition (model_1.py)**
 When the user captures or uploads an image:
@@ -63,6 +65,7 @@ confidence: Prediction confidence
 
 audioUrl: Path to the generated audio file
 
+
 4. 🌐** AR Display Interface**: ar.html
 The AR interface is optimized for wearable smart glasses (e.g. Vuzix) and presents landmark information in real time:
 
@@ -71,6 +74,7 @@ Polling Mechanism: ar.html continuously polls /current-label to check for new pr
 Sync with index.html: Any successful prediction update from the image classification on index.html instantly updates the AR view.
 
 Minimalist UI: Presents only the landmark label and its description — perfect for glanceable, distraction-free viewing.
+
 
 
 🧩** Technical Highlights**
