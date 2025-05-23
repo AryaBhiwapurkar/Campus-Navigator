@@ -2,7 +2,7 @@
 🔁 User Flow & System Pipeline
 This project enables real-time landmark recognition and navigation guidance using computer vision, OCR, and geospatial logic. It supports both standard web interfaces and AR smart glasses. Below is a breakdown of the system architecture and interaction flow:
 
-1. 🧭 Initial Interaction: index.html
+1. 🧭 **Initial Interaction: index.html**
 Upon launching the application through index.html, users are presented with two primary actions:
 
 📍 "Send My Location": This one-time action initializes the navigation session by capturing the user's current GPS coordinates. It triggers server-side logic to continuously guide the user through nearby unvisited landmarks.
@@ -20,7 +20,7 @@ Nearest Landmark Selection: Filters out visited landmarks, sorts the rest by dis
 
 Audio Navigation Instructions: Text-to-speech prompts are generated dynamically using audio_conversion.py and returned as .mp3 files for playback.
 
-3. 🧠 Image-Based Landmark Recognition (model_1.py)
+3. 🧠 **Image-Based Landmark Recognition (model_1.py)**
 When the user captures or uploads an image:
 
 The frontend (index.html) sends the image to the /classify-image endpoint.
@@ -63,7 +63,7 @@ confidence: Prediction confidence
 
 audioUrl: Path to the generated audio file
 
-4. 🌐 AR Display Interface: ar.html
+4. 🌐** AR Display Interface**: ar.html
 The AR interface is optimized for wearable smart glasses (e.g. Vuzix) and presents landmark information in real time:
 
 Polling Mechanism: ar.html continuously polls /current-label to check for new predictions.
@@ -72,7 +72,8 @@ Sync with index.html: Any successful prediction update from the image classifica
 
 Minimalist UI: Presents only the landmark label and its description — perfect for glanceable, distraction-free viewing.
 
-🧩 Technical Highlights
+
+🧩** Technical Highlights**
 Dual Modality Output: Combines visual display + audio narration for improved accessibility.
 
 Hybrid Recognition: CNN-based classification with OCR fallback ensures robustness in real-world scenarios.
