@@ -1,0 +1,318 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Campus Navigator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #754ef9;
+    }
+
+    .btn {
+      background-color: #754ef9;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 10px auto;
+      display: block;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #5b3ec8;
+    }
+
+    #instruction-area {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: #ffffff;
+      border-left: 5px solid #754ef9;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    #instruction-audio {
+      display: none;
+      margin: 20px auto;
+    }
+
+    video {
+      display: none;
+      width: 100%;
+      max-width: 500px;
+      margin: 20px auto;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    canvas {
+      display: none;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      text-align: center;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .modal-content img {
+      max-width: 100%;
+      height: auto;
+      margin-bottom: 15px;
+    }
+
+    #closeModal {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      font-size: 22px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    #closeModal:hover {
+      color: #000;
+    }
+
+    /* New styles for popup audio controls */
+    #popup-audio {
+      margin-top: 10px;
+      width: 100%;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>Campus Navigator</h1>
+
+  <button id="uploadModeBtn" class="btn">📸 Open Camera</button>
+  <button id="captureBtn" class="btn" style="display:none;">📷 Capture & Predict</button>
+  <!-- Removed liveScanBtn -->
+  <button id="sendLocBtn" class="btn">📍 Send My Location</button>
+
+  <video id="camera" autoplay playsinline></video>
+  <canvas id="snapshot"></canvas>
+
+  <div id="instruction-area">Press the button above to get instructions based on your location.</div>
+  <audio id="instruction-audio" controls></audio>
+
+  <!-- Prediction Result Modal -->
+  <div id="resultModal" class="modal">
+    <div class="modal-content">
+      <span id="closeModal">&times;</span>
+      <h3>Prediction Result</h3>
+      <img id="previewImage" src="" alt="Captured preview" />
+      <p id="predictionText"></p>
+      <p id="descriptionText"></p>
+      <!-- NEW audio for popup -->
+      <audio id="popup-audio" controls></audio>
+    </div>
+  </div>
+
+  <script>
+    const instructionDiv = document.getElementById('instruction-area');
+    const audioElem = document.getElementById('instruction-audio');
+    const uploadBtn = document.getElementById('uploadModeBtn');
+    const captureBtn = document.getElementById('captureBtn');
+    const camera = document.getElementById('camera');
+    const canvas = document.getElementById('snapshot');
+    const modal = document.getElementById('resultModal');
+    const closeModal = document.getElementById('closeModal');
+    const previewImage = document.getElementById('previewImage');
+    const predictionText = document.getElementById('predictionText');
+    const descriptionText = document.getElementById('descriptionText');
+    const popupAudio = document.getElementById('popup-audio');
+
+    let latestMessage = "Press the button above to get instructions based on your location.";
+    let loadingTimer;
+    let mediaStream = null;
+
+    function updateInstruction(newMessage, audioUrl) {
+      instructionDiv.textContent = latestMessage;
+
+      loadingTimer = setTimeout(() => {
+        instructionDiv.textContent = "🔄 Getting your location...";
+      }, 25000);
+
+      setTimeout(() => {
+        clearTimeout(loadingTimer);
+        latestMessage = newMessage;
+        instructionDiv.textContent = newMessage;
+
+        if (audioUrl) {
+          audioElem.src = audioUrl;
+          audioElem.style.display = 'block';
+          audioElem.play();
+        } else {
+          audioElem.pause();
+          audioElem.style.display = 'none';
+        }
+      }, 30000);
+    }
+
+    function sendLocation() {
+      if (!navigator.geolocation) {
+        instructionDiv.textContent = "❌ Geolocation is not supported by your browser.";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          fetch('/send-location', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            updateInstruction(data.message || "No instruction received.", data.audioUrl);
+          })
+          .catch(err => {
+            instructionDiv.textContent = "❌ Error sending location.";
+            console.error(err);
+          });
+        },
+        (error) => {
+          instructionDiv.textContent = "❌ Failed to get location: " + error.message;
+        }
+      );
+    }
+
+    function stopCamera() {
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(track => track.stop());
+        mediaStream = null;
+        camera.srcObject = null;
+        camera.style.display = 'none';
+        captureBtn.style.display = 'none';
+        uploadBtn.textContent = '📸 Open Camera';
+      }
+    }
+
+    document.getElementById('sendLocBtn').addEventListener('click', sendLocation);
+    setInterval(sendLocation, 30000); // periodic location updates
+
+    uploadBtn.addEventListener('click', async () => {
+      if (mediaStream) {
+        stopCamera();
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+        });
+        mediaStream = stream;
+        camera.srcObject = stream;
+        camera.style.display = 'block';
+        captureBtn.style.display = 'block';
+        uploadBtn.textContent = '❌ Close Camera';
+      } catch (err) {
+        alert("❌ Unable to access camera.");
+        console.error(err);
+      }
+    });
+
+    captureBtn.addEventListener('click', () => {
+      const context = canvas.getContext('2d');
+      canvas.width = camera.videoWidth;
+      canvas.height = camera.videoHeight;
+      context.drawImage(camera, 0, 0, canvas.width, canvas.height);
+
+      canvas.toBlob(blob => {
+        const formData = new FormData();
+        formData.append('image', blob, 'capture.jpg');
+
+        fetch('/classify-image', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            previewImage.src = e.target.result;
+            predictionText.textContent = `🏷️ Prediction: ${data.label}`;
+            descriptionText.textContent = `📖 ${data.description}`;
+            modal.style.display = 'block';
+
+            // STOP any existing popup audio before playing new
+            popupAudio.pause();
+            popupAudio.currentTime = 0;
+
+            if (data.audio) {
+              popupAudio.src = data.audio;
+              popupAudio.style.display = 'block';
+              popupAudio.play();
+            } else {
+              popupAudio.style.display = 'none';
+            }
+
+            stopCamera(); // optional: close camera after capture
+          };
+          reader.readAsDataURL(blob);
+        })
+        .catch(err => {
+          alert("❌ Error during classification.");
+          console.error(err);
+        });
+      }, 'image/jpeg');
+    });
+
+    function closeModalAndStopCamera() {
+      modal.style.display = "none";
+      popupAudio.pause();
+      popupAudio.currentTime = 0;
+      stopCamera();
+    }
+
+    closeModal.onclick = closeModalAndStopCamera;
+
+    window.onclick = (event) => {
+      if (event.target === modal) closeModalAndStopCamera();
+    };
+
+    window.addEventListener('keydown', e => {
+      if (e.key === "Escape" && modal.style.display === "block") {
+        closeModalAndStopCamera();
+      }
+    });
+  </script>
+</body>
+</html>

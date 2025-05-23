@@ -1,0 +1,42 @@
+{
+    "auditorium": {
+        "gps": [21.12845541824991, 81.76558735795037],
+        "description": "This state-of-the-art auditorium boasts a seating capacity of 700, making it an ideal venue for hosting a wide range of academic and cultural events.",
+        "description_2": "To visit the Canteen, walk straight for 50 meters and turn right. To visit the Bose House, walk straight along the road along the ground fo 100 metres and take left and walk straight for 140 metres."
+    },
+    "canteen": {
+        "gps": [21.127966653846226, 81.76572732254897],
+        "description": "The canteen is a large and modern facility with a seating capacity of approximately 870, providing ample space for students and staff to enjoy their meals.",
+        "description_2": "To reach the Academic Building, walk 100 meters ahead and take a left turn and walk 30 metres. To visit Auditorium, walk 50 metres towards the longer part of the road and face left."
+    },
+    "acad": {
+        "gps": [21.128032655514257, 81.76637771291134],
+        "description": "The Academic Block houses 14 lecture halls with capacities ranging from 60 to 120 students, and 12 tutorial halls, each accommodating approximately 40 students.",
+        "description_2": "To reach the Research Lab, take the main pathway and continue straight for 90 meters and face slightly left of straight"
+    },
+    "lab": {
+        "gps": [21.128412142412103, 81.76695549822541],
+        "description": "The laboratory building where students conduct experiments and research.",
+        "description_2": "To visit the Raman House, head straight for 15 meters and face right"
+    },
+    "complex": {
+        "gps": [21.129094161698102, 81.76708780512256],
+        "description": "The shopping complex with various food, grocery, and dispensary facilities.",
+        "description_2": "To visit the Ramanujan Hostel, walk 150 meters along the road."
+    },
+    "ramanujan": {
+        "gps": [21.12987090580691, 81.76611197236053],
+        "description": "Ramanujan House is a large, multi-story boys' hostel with 391 rooms across six floors, offering amenities like 24-hour internet, water coolers, geysers, and a common room. It boasts a build-up area of 6080 sq. meters.",
+        "description_2": "To reach Bose House, walk 180 meters along the road, beside the ground and take first left. To reach Bose House, walk 320 meters along the road, beside the ground."
+    },
+    "bose": {
+        "gps": [21.12778689753694, 81.76441243040722],
+        "description": "Bose House is a girl's hostel with 89 rooms spread across four floors, offering amenities like Wi-Fi, water coolers, a geyser, a common room, and a badminton court. It has a build-up area of 2182 sq. meters.",
+        "description_2": "To get to Auditorium, move 140 meters towards longer path and take a right and walk for 110 metres."
+    },
+    "raman": {
+        "gps": [21.12860244835783, 81.76714470004497],
+        "description": "Raman House is a boy's hostel with 120 rooms across four floors, offering amenities like 24/7 Wi-Fi, water coolers, a gym, and sports facilities. It has a build-up area of 2720 sq. meters.",
+        "description_2": "To reach Shopping Complex, turn left and go along the road for 55 meters."
+    }
+}
