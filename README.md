@@ -1,101 +1,96 @@
-# Campus-Navigator
-🔁 User Flow & System Pipeline
-This project enables real-time landmark recognition and navigation guidance using computer vision, OCR, and geospatial logic. It supports both standard web interfaces and AR smart glasses. Below is a breakdown of the system architecture and interaction flow:
+1. 🧭 Initial Interaction (index.html)
+Upon visiting index.html, users are presented with two primary actions:
 
-1. 🧭 **Initial Interaction: index.html**
-Upon launching the application through index.html, users are presented with two primary actions:
+📍 Send My Location
+Initializes navigation by capturing the user's current GPS coordinates.
+Triggers the backend (server.js) to calculate and guide the user to the two nearest unvisited landmarks, using real-time geospatial logic.
 
-📍 "Send My Location": This one-time action initializes the navigation session by capturing the user's current GPS coordinates. It triggers server-side logic to continuously guide the user through nearby unvisited landmarks.
-
-📸 "Open Camera": Launches the webcam interface, allowing users to capture images of landmarks in real-time. The image is sent to the backend for landmark classification and information retrieval.
-
+📸 Open Camera
+Activates the webcam to capture images of landmarks.
+The captured image is sent to the backend for landmark classification and description retrieval.
 
 2. 📡 Location-Based Navigation (Persistent Session)
-Once the user's location is submitted, the server (via server.js) activates a navigation system powered by:
+Once a location is submitted:
 
-Haversine Distance Calculation: Computes distance between user coordinates and all known landmark GPS coordinates.
+Haversine Distance Calculation
+Computes the distance between user coordinates and each known landmark.
 
-Visited Landmark Tracking: A global visited object keeps track of user progress through the tour.
+Visited Landmark Tracking
+A global visited object in server.js tracks which landmarks the user has visited.
 
-Nearest Landmark Selection: Filters out visited landmarks, sorts the rest by distance, and selects the two nearest unvisited landmarks.
+Nearest Landmark Selection
+Filters out visited landmarks, sorts remaining ones by distance, and selects the two nearest for navigation.
 
-Audio Navigation Instructions: Text-to-speech prompts are generated dynamically using audio_conversion.py and returned as .mp3 files for playback.
+Audio Navigation Instructions
+Directions and landmark names are converted to speech using audio_conversion.py (Google Text-to-Speech), and served as .mp3 files.
 
-
-3. 🧠 **Image-Based Landmark Recognition (model_1.py)**
+3. 🧠 Image-Based Landmark Recognition (model_1.py)
 When the user captures or uploads an image:
 
-The frontend (index.html) sends the image to the /classify-image endpoint.
+API Endpoint:
+index.html sends the image to /classify-image endpoint.
 
-The backend (model_1.py) performs a deep learning classification pipeline, including:
-
+Deep Learning Pipeline:
 a. Image Enhancement & Preprocessing
 
-Resize, enhance contrast, apply Gaussian blur.
+Resize image, enhance contrast, apply Gaussian blur.
 
-Normalize and reshape image to 224x224 pixels for model input.
+Normalize and reshape to 224x224 pixels for model input.
 
 b. Landmark Classification
 
-Uses a fine-tuned MobileNetV2 CNN model to classify 8 campus landmarks.
+Uses a fine-tuned MobileNetV2 CNN to classify 8 campus landmarks.
 
-Outputs prediction with confidence score.
+Outputs a prediction with a confidence score.
 
 c. OCR Fallback
 
-If confidence is below 60%, Tesseract OCR scans image text for landmark names as a backup detection method.
+If confidence < 60%, uses Tesseract OCR to extract textual hints from the image.
 
 d. Description Retrieval
 
-Fetches landmark metadata from landmarks2.json.
+Fetches details from landmarks2.json based on predicted label.
 
 e. Audio Generation
 
-Uses Google Text-to-Speech (gTTS) to convert text to audio.
+Converts the prediction or navigation instruction into an .mp3 file using Google TTS.
 
-Resulting .mp3 file is served via /audio/:filename.
+Response JSON:
+![image](https://github.com/user-attachments/assets/172ce9dc-5077-4264-9918-5509e15d77f4)
+4. 🌐 AR Display Interface (ar.html)
+This interface is designed for smart glasses (e.g. Vuzix), providing hands-free, real-time feedback:
 
-JSON response includes:
+Continuous Polling
+ar.html polls /current-label to fetch the latest landmark prediction and description.
 
-label: Predicted landmark
+Synchronized Updates
+Every new prediction on index.html automatically reflects on ar.html, so users wearing glasses see the same update instantly.
 
-description: Informative text
+Minimalist Display
+Focuses on essential information (label + description), optimized for AR readability.
 
-confidence: Prediction confidence
+🧩 Technical Highlights
+🎯 Dual Modality Output
+Visual + audio feedback for enhanced accessibility and user experience.
 
-audioUrl: Path to the generated audio file
+🧠 Hybrid Recognition Logic
+Combines deep learning and OCR to handle diverse real-world inputs.
 
+⚡ Performance Optimizations
+Image preprocessing ensures fast, accurate model inference.
 
-4. 🌐** AR Display Interface**: ar.html
-The AR interface is optimized for wearable smart glasses (e.g. Vuzix) and presents landmark information in real time:
+📍 Location-Aware Guidance
+Real-time navigation powered by Haversine distance calculations.
 
-Polling Mechanism: ar.html continuously polls /current-label to check for new predictions.
+🛠 Modular Architecture
 
-Sync with index.html: Any successful prediction update from the image classification on index.html instantly updates the AR view.
+File	Purpose
+index.html	Main user interface for interaction and image capture
+ar.html	AR smart glasses interface
+server.js	Backend logic for routing, GPS handling, landmark tracking, audio streaming
+model_1.py	Deep learning model for landmark classification
+audio_conversion.py	Text-to-speech conversion via Google TTS
+landmarks2.json	Landmark metadata and descriptions
 
-Minimalist UI: Presents only the landmark label and its description — perfect for glanceable, distraction-free viewing.
-
-
-
-🧩** Technical Highlights**
-Dual Modality Output: Combines visual display + audio narration for improved accessibility.
-
-Hybrid Recognition: CNN-based classification with OCR fallback ensures robustness in real-world scenarios.
-
-Optimized Preprocessing: Reduces latency while maintaining model accuracy.
-
-Location-Aware Navigation: Real-time GPS-based guidance using Haversine logic.
-
-Modular Architecture:
-
-index.html: Main user interface
-
-ar.html: AR glasses interface
-
-server.js: Express backend handling classification, location logic, and audio generation
-
-model_1.py: Deep learning inference logic
-
-audio_conversion.py: Text-to-speech engine
-
-AR-Ready: Built with smart glasses integration in mind — clean, reactive, and low-latency.
+🕶 AR-Ready by Design
+Clean, reactive, and low-latency interface tailored for augmented reality environments
