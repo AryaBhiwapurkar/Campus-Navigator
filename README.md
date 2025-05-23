@@ -1,4 +1,5 @@
-**🎓Campus Navigator**
+****🎓Campus Navigator****:
+
 Campus Navigator is a real-time landmark recognition and navigation system for campus environments. It combines computer vision, OCR, geospatial logic, and AR integration to guide users via audio and visual outputs. The app runs on both traditional web interfaces and AR smart glasses.
 
 🔁 User Flow & System Architecture
